@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Reference · HEXACRIMSON LABS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/docs.css" />
+</head>
+<body>
+  <div class="scanlines"></div>
+  <nav>
+    <a href="/" class="logo"><span class="brand-crimson">HEXACRIMSON</span> <span class="labs-white">LABS</span></a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/dashboard/">Dashboard</a></li>
+      <li><a href="/docs/api.html" class="active">Docs</a></li>
+      <li><a class="nav-cta" href="/dashboard/">Open dashboard</a></li>
+    </ul>
+  </nav>
+  <article class="doc-page">
+    <div class="section-label">Documentation</div>
+    <h1>API Reference</h1>
+    <p class="lede">Complete Hexacrimson API for agent management, configuration, metrics streaming, and billing.</p>
+    <nav class="doc-nav">
+      <a href="/docs/quickstart.html">Quickstart</a>
+      <a href="/docs/api.html" class="active">API Reference</a>
+      <a href="/docs/security.html">Security</a>
+      <a href="/docs/cli.html">CLI Reference</a>
+    </nav>
+
+    <h2>Base URL</h2>
+    <pre id="base">https://YOUR_HOST</pre>
+
+    <h2>Health</h2>
+    <pre>GET /health</pre>
+    <p>Returns control-plane health and version.</p>
+
+    <h2>Fleet status</h2>
+    <pre>GET /api/status</pre>
+    <p>High-level counters: active agents, installing, pending, environments, uptime.</p>
+
+    <h2>List agents</h2>
+    <pre>GET /api/agents</pre>
+
+    <h2>Enroll agent</h2>
+    <pre>POST /api/agents/enroll
+Content-Type: application/json
+X-Enroll-Token: hxl-...
+
+{
+  "token": "hxl-7f3a9c2e1b4d8a6f",
+  "hostname": "edge-01",
+  "environment": "aws",
+  "region": "us-east-1"
+}</pre>
+    <p>Returns agent id, pid, and connection details.</p>
+
+    <h2>Heartbeat</h2>
+    <pre>POST /api/agents/:id/heartbeat
+Content-Type: application/json
+
+{ "metrics": { "cpu": 12.4, "memory": 41.2 } }</pre>
+
+    <h2>Modules</h2>
+    <pre>POST /api/agents/:id/modules
+
+{ "monitoring": true, "threatDetection": true, "wifiIntelligence": false }</pre>
+
+    <h2>Remove agent</h2>
+    <pre>DELETE /api/agents/:id</pre>
+
+    <h2>Metrics summary</h2>
+    <pre>GET /api/metrics/summary</pre>
+
+    <h2>Events</h2>
+    <pre>GET /api/events</pre>
+
+    <h2>Billing</h2>
+    <pre>GET  /api/billing/subscription
+GET  /api/billing/invoices
+POST /api/billing/subscribe
+{
+  "plan": "Pro",
+  "price": 99,
+  "period": "monthly",
+  "addonSecurity": true,
+  "method": "card"
+}</pre>
+  </article>
+  <script>document.getElementById('base').textContent = location.origin;</script>
+</body>
+</html>

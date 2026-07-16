@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quickstart · HEXACRIMSON LABS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/docs.css" />
+</head>
+<body>
+  <div class="scanlines"></div>
+  <nav>
+    <a href="/" class="logo"><span class="brand-crimson">HEXACRIMSON</span> <span class="labs-white">LABS</span></a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/dashboard/">Dashboard</a></li>
+      <li><a href="/docs/quickstart.html" class="active">Docs</a></li>
+      <li><a class="nav-cta" href="/dashboard/">Open dashboard</a></li>
+    </ul>
+  </nav>
+  <article class="doc-page">
+    <div class="section-label">Documentation</div>
+    <h1>Quickstart Guide</h1>
+    <div class="meta-row"><span>⏱ ~8 min read</span><span>Agent v3.2.1</span></div>
+    <p class="lede">Get your first Hexacrimson agent up and running in under 5 minutes. Covers installation, authentication, and basic commands.</p>
+
+    <nav class="doc-nav">
+      <a href="/docs/quickstart.html" class="active">Quickstart</a>
+      <a href="/docs/api.html">API Reference</a>
+      <a href="/docs/security.html">Security</a>
+      <a href="/docs/cli.html">CLI Reference</a>
+    </nav>
+
+    <h2>1. Download</h2>
+    <p>Run the one-liner installer. It auto-detects your OS and architecture, downloads the signed agent binary, verifies the checksum, and enrolls with your control plane.</p>
+    <pre id="installLine">curl -sSL https://YOUR_HOST/install.sh | bash</pre>
+    <p>Windows (PowerShell):</p>
+    <pre id="psLine">irm https://YOUR_HOST/public/agent.ps1 | iex</pre>
+
+    <h2>2. Authenticate</h2>
+    <p>The agent generates a unique identity and registers using a short-lived enrollment token. Demo token (override with <code>HXL_TOKEN</code>):</p>
+    <pre>export HXL_TOKEN=hxl-7f3a9c2e1b4d8a6f
+curl -sSL https://YOUR_HOST/install.sh | bash</pre>
+
+    <h2>3. Manage</h2>
+    <p>Once connected, manage agents from the dashboard — push module configs, run heartbeats, and view metrics in real time.</p>
+    <pre>open https://YOUR_HOST/dashboard/</pre>
+    <ul>
+      <li>View fleet CPU / memory / threat stats</li>
+      <li>Enable Monitoring, Threat Detection, or WiFi Intelligence modules</li>
+      <li>Decommission agents you no longer need</li>
+    </ul>
+
+    <h2>Optional environment variables</h2>
+    <table class="doc-table">
+      <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>HXL_TOKEN</code></td><td><code>hxl-7f3a…</code></td><td>Enrollment token</td></tr>
+        <tr><td><code>HXL_ENV</code></td><td><code>local</code></td><td>Environment label (aws, gcp, edge…)</td></tr>
+        <tr><td><code>HXL_REGION</code></td><td><code>unknown</code></td><td>Region / DC tag</td></tr>
+      </tbody>
+    </table>
+
+    <p><a href="/dashboard/">→ Open the live dashboard</a></p>
+  </article>
+  <script>
+    const o = location.origin;
+    document.getElementById('installLine').textContent = `curl -sSL ${o}/install.sh | bash`;
+    document.getElementById('psLine').textContent = `irm ${o}/public/agent.ps1 | iex`;
+  </script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HEXACRIMSON LABS // Control Plane</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/dashboard.css" />
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+
+  <nav>
+    <a href="/" class="logo"><span class="brand-crimson">HEXACRIMSON</span> <span class="labs-white">LABS</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Home</a></li>
+      <li><a href="/dashboard/" class="active">Dashboard</a></li>
+      <li><a href="/docs/quickstart.html">Docs</a></li>
+      <li><a href="/#billing" onclick="window.location.href='/#billing'">Billing</a></li>
+      <li><a class="nav-cta" href="#" id="enrollBtn">Enroll agent</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </nav>
+
+  <main class="dash">
+    <header class="dash-header">
+      <div>
+        <div class="section-label">Control plane · live</div>
+        <h1>Agent fleet</h1>
+        <p class="muted">Real-time telemetry from every Hexacrimson agent connected to this hub.</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-ghost" id="refreshBtn">↻ Refresh</button>
+        <button class="btn-primary" id="enrollBtn2">+ Enroll agent</button>
+      </div>
+    </header>
+
+    <section class="stat-grid" id="statGrid">
+      <article class="stat-card">
+        <div class="stat-label"><span class="dot online"></span> Active agents</div>
+        <div class="stat-value" id="statOnline">—</div>
+        <div class="stat-sub">Online now</div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-label">Avg CPU</div>
+        <div class="stat-value" id="statCpu">—</div>
+        <div class="stat-sub">Across fleet</div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-label">Avg memory</div>
+        <div class="stat-value" id="statMem">—</div>
+        <div class="stat-sub">Across fleet</div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-label">Threats blocked</div>
+        <div class="stat-value" id="statThreats">—</div>
+        <div class="stat-sub">Anomalies: <span id="statAnomalies">0</span></div>
+      </article>
+    </section>
+
+    <section class="panels">
+      <div class="panel agents-panel">
+        <div class="panel-head">
+          <h2>Deployed agents</h2>
+          <span class="badge" id="agentCount">0</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Hostname</th>
+                <th>ID</th>
+                <th>Env</th>
+                <th>CPU</th>
+                <th>Mem</th>
+                <th>Modules</th>
+                <th>Last seen</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="agentRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="side-stack">
+        <div class="panel">
+          <div class="panel-head"><h2>Install command</h2></div>
+          <div class="cmd-box">
+            <code id="installCmd">curl -sSL …/install.sh | bash</code>
+            <button class="copy-btn" id="copyInstall">Copy</button>
+          </div>
+          <p class="hint">Windows: <code>irm …/public/agent.ps1 | iex</code></p>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Event stream</h2></div>
+          <ul class="events" id="eventList"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="enrollModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>Enroll agent</h3>
+        <button class="bill-close" id="closeEnroll">✕</button>
+      </div>
+      <form id="enrollForm">
+        <label>Enrollment token
+          <input name="token" value="hxl-7f3a9c2e1b4d8a6f" required />
+        </label>
+        <label>Hostname
+          <input name="hostname" placeholder="edge-node-01" required />
+        </label>
+        <label>Environment
+          <select name="environment">
+            <option value="aws">AWS</option>
+            <option value="azure">Azure</option>
+            <option value="gcp">GCP</option>
+            <option value="on-prem">On-prem</option>
+            <option value="edge">Edge</option>
+            <option value="local">Local</option>
+          </select>
+        </label>
+        <label>Region
+          <input name="region" value="us-east-1" />
+        </label>
+        <button type="submit" class="btn-primary full">Enroll &amp; activate</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><div class="toast-body" id="toastBody"></div></div>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

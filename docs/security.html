@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Security Overview · HEXACRIMSON LABS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/docs.css" />
+</head>
+<body>
+  <div class="scanlines"></div>
+  <nav>
+    <a href="/" class="logo"><span class="brand-crimson">HEXACRIMSON</span> <span class="labs-white">LABS</span></a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/dashboard/">Dashboard</a></li>
+      <li><a href="/docs/security.html" class="active">Docs</a></li>
+      <li><a class="nav-cta" href="/dashboard/">Open dashboard</a></li>
+    </ul>
+  </nav>
+  <article class="doc-page">
+    <div class="section-label">Documentation</div>
+    <h1>Security Overview</h1>
+    <p class="lede">How Hexacrimson agents authenticate, encrypt communications, and fit into a zero-trust control plane.</p>
+    <nav class="doc-nav">
+      <a href="/docs/quickstart.html">Quickstart</a>
+      <a href="/docs/api.html">API Reference</a>
+      <a href="/docs/security.html" class="active">Security</a>
+      <a href="/docs/cli.html">CLI Reference</a>
+    </nav>
+
+    <h2>Zero-trust enrollment</h2>
+    <p>Agents enroll with a short-lived token (<code>hxl-…</code>). Tokens are hashed at rest; the control plane never stores raw secrets longer than the request lifecycle.</p>
+
+    <h2>Signed binaries</h2>
+    <p>Installers verify SHA-256 checksums before activation. Production deployments should pin checksums and serve installers over TLS only.</p>
+
+    <h2>Transport</h2>
+    <ul>
+      <li>TLS for all hub traffic (mTLS recommended in production)</li>
+      <li>Heartbeat intervals keep agent status fresh without long-lived reverse shells</li>
+      <li>Module toggles are explicit API calls — no silent privilege escalation</li>
+    </ul>
+
+    <h2>Security Agent add-on</h2>
+    <ul>
+      <li><strong>Monitoring</strong> — CPU, memory, process anomaly signals</li>
+      <li><strong>Threat Detection</strong> — signature + behavioral heuristics, quarantine hooks</li>
+      <li><strong>WiFi Intelligence</strong> — rogue AP / deauth / SSID spoofing signals on edge segments</li>
+    </ul>
+
+    <h2>Compliance posture</h2>
+    <p>Architecture is designed to support SOC 2, HIPAA, and GDPR control mappings (access logging, encryption in transit, data minimization). This open demo stores agent metadata locally in <code>data/agents.json</code> — replace with a hardened datastore for production.</p>
+  </article>
+</body>
+</html>

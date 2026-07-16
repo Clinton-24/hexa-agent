@@ -1,0 +1,53 @@
+.doc-page { max-width: 860px; margin: 0 auto; padding: 2.5rem 5% 5rem; }
+.doc-page h1 {
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 900;
+  letter-spacing: -1px; margin-bottom: .75rem;
+}
+.doc-page .lede {
+  font-size: 1.05rem; color: rgba(255,255,255,.5); margin-bottom: 2rem; line-height: 1.6;
+}
+.doc-page h2 {
+  font-size: 1.25rem; margin: 2.25rem 0 .75rem; color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,.06); padding-bottom: .5rem;
+}
+.doc-page h3 { font-size: 1rem; margin: 1.5rem 0 .5rem; color: rgba(255,255,255,.9); }
+.doc-page p, .doc-page li {
+  color: rgba(255,255,255,.65); line-height: 1.7; margin-bottom: .75rem;
+}
+.doc-page ul, .doc-page ol { padding-left: 1.25rem; margin-bottom: 1rem; }
+.doc-page pre {
+  background: #0a0c10; border: 1px solid rgba(220,20,60,.18);
+  border-radius: 10px; padding: 1rem 1.15rem; overflow-x: auto;
+  margin: 1rem 0 1.5rem; font-family: 'JetBrains Mono', monospace;
+  font-size: .82rem; color: #9cff9c; line-height: 1.55;
+}
+.doc-page a { color: #ff6b8a; text-decoration: none; }
+.doc-page a:hover { text-decoration: underline; }
+.doc-nav {
+  display: flex; flex-wrap: wrap; gap: .6rem; margin: 2rem 0;
+}
+.doc-nav a {
+  padding: .45rem .9rem; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,.1);
+  color: rgba(255,255,255,.55); font-size: .75rem;
+  letter-spacing: 1px; text-transform: uppercase; text-decoration: none;
+}
+.doc-nav a:hover, .doc-nav a.active {
+  border-color: rgba(220,20,60,.4); color: #DC143C; text-decoration: none;
+}
+.meta-row {
+  display: flex; gap: 1rem; flex-wrap: wrap;
+  font-size: .75rem; color: rgba(255,255,255,.35); margin-bottom: 1.5rem;
+}
+table.doc-table {
+  width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: .85rem;
+}
+table.doc-table th, table.doc-table td {
+  text-align: left; padding: .65rem .5rem;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  color: rgba(255,255,255,.7);
+}
+table.doc-table th {
+  color: rgba(255,255,255,.4); font-size: .7rem;
+  letter-spacing: 1px; text-transform: uppercase;
+}

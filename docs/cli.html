@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CLI Reference · HEXACRIMSON LABS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/docs.css" />
+</head>
+<body>
+  <div class="scanlines"></div>
+  <nav>
+    <a href="/" class="logo"><span class="brand-crimson">HEXACRIMSON</span> <span class="labs-white">LABS</span></a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/dashboard/">Dashboard</a></li>
+      <li><a href="/docs/cli.html" class="active">Docs</a></li>
+      <li><a class="nav-cta" href="/dashboard/">Open dashboard</a></li>
+    </ul>
+  </nav>
+  <article class="doc-page">
+    <div class="section-label">Documentation</div>
+    <h1>CLI Reference</h1>
+    <p class="lede">Commands and flags for the Hexacrimson agent CLI and HTTP equivalents used by this control plane.</p>
+    <nav class="doc-nav">
+      <a href="/docs/quickstart.html">Quickstart</a>
+      <a href="/docs/api.html">API Reference</a>
+      <a href="/docs/security.html">Security</a>
+      <a href="/docs/cli.html" class="active">CLI Reference</a>
+    </nav>
+
+    <h2>Install</h2>
+    <pre id="install">curl -sSL https://YOUR_HOST/install.sh | bash</pre>
+
+    <h2>agent enroll</h2>
+    <pre>agent enroll --token hxl-7f3a9c2e1b4d8a6f [--env aws] [--region us-east-1]</pre>
+    <p>HTTP equivalent:</p>
+    <pre>curl -X POST /api/agents/enroll \
+  -H "Content-Type: application/json" \
+  -H "X-Enroll-Token: hxl-7f3a9c2e1b4d8a6f" \
+  -d '{"token":"hxl-7f3a9c2e1b4d8a6f","hostname":"edge-01"}'</pre>
+
+    <h2>agent status</h2>
+    <pre>agent status
+agent status --id hxl-a1b2c3d4</pre>
+    <p>HTTP: <code>GET /api/agents</code> or <code>GET /api/agents/:id</code></p>
+
+    <h2>agent heartbeat</h2>
+    <pre>agent heartbeat --id hxl-a1b2c3d4</pre>
+    <p>HTTP: <code>POST /api/agents/:id/heartbeat</code></p>
+
+    <h2>Modules</h2>
+    <pre>agent module enable threat
+agent module enable wifi
+agent module enable monitoring</pre>
+    <p>HTTP: <code>POST /api/agents/:id/modules</code></p>
+
+    <h2>Environment flags</h2>
+    <table class="doc-table">
+      <thead><tr><th>Flag / env</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>--token</code> / <code>HXL_TOKEN</code></td><td>Enrollment token</td></tr>
+        <tr><td><code>--env</code> / <code>HXL_ENV</code></td><td>Environment label</td></tr>
+        <tr><td><code>--region</code> / <code>HXL_REGION</code></td><td>Region tag</td></tr>
+      </tbody>
+    </table>
+  </article>
+  <script>
+    document.getElementById('install').textContent =
+      `curl -sSL ${location.origin}/install.sh | bash`;
+  </script>
+</body>
+</html>
