@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HEXACRIMSON LABS // Agent Install & Deploy</title>
+    <title>Hexacrimson Labs · Agent install & deploy</title>
+    <link rel="icon" href="/public/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/public/favicon.svg" />
+    <meta name="theme-color" content="#DC143C" />
     <style>
         * {
             margin: 0;
@@ -3336,6 +3339,24 @@
         async function triggerInstall(event) {
             if (event) event.preventDefault();
 
+            // Billing must complete before any agent deploy
+            try {
+                const subRes = await fetch('/api/billing/subscription');
+                const sub = subRes.ok ? await subRes.json() : { active: false };
+                if (!sub.active) {
+                    showToast(event, 'Complete billing first — choose a plan to unlock agent deploy.');
+                    openBillingDashboard(event);
+                    // Scroll pricing into view behind the modal for context
+                    const pricing = document.getElementById('pricing');
+                    if (pricing) pricing.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    return;
+                }
+            } catch (_) {
+                showToast(event, 'Complete billing first — choose a plan to unlock agent deploy.');
+                openBillingDashboard(event);
+                return;
+            }
+
             const messages = [
                 'Downloading Hexacrimson agent binary...',
                 'Verifying checksum... ✓',
@@ -3371,6 +3392,12 @@
                     })
                 });
                 enrollResult = await res.json();
+                if (res.status === 402 || enrollResult.code === 'BILLING_REQUIRED') {
+                    toast.classList.remove('show');
+                    showToast(event, enrollResult.message || 'Billing required before deploy.');
+                    openBillingDashboard(event);
+                    return;
+                }
             } catch (_) {}
 
             let progress = 0;
@@ -3398,11 +3425,11 @@
                     clearInterval(progressInterval);
                     const activeEl = document.getElementById('activeCount');
                     const installingEl = document.getElementById('installingCount');
-                    if (activeEl) {
+                    if (activeEl && enrollResult && enrollResult.ok) {
                         let val = parseInt(activeEl.textContent.replace(/,/g, '')) + 1;
                         activeEl.textContent = val.toLocaleString();
                     }
-                    if (installingEl) {
+                    if (installingEl && enrollResult && enrollResult.ok) {
                         let val = parseInt(installingEl.textContent) - 1;
                         if (val < 0) val = 0;
                         installingEl.textContent = val;
@@ -3412,6 +3439,8 @@
                         toastProgress.style.width = '0%';
                         if (enrollResult && enrollResult.ok) {
                             showToast(null, 'Agent online — open Dashboard to manage it');
+                        } else if (enrollResult && enrollResult.error) {
+                            showToast(null, enrollResult.error);
                         }
                     }, 2200);
                 }

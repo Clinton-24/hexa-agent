@@ -21,30 +21,66 @@ app.use(express.urlencoded({ extended: true }));
 
 // ── In-memory + file-backed agent store ─────────────────────────────────────
 
+function defaultSubscription() {
+  return {
+    active: false,
+    plan: null,
+    price: 0,
+    period: 'monthly',
+    addonSecurity: false,
+    agentsLimit: 0,
+    usage: { agents: 0, apiCalls: 0, storageGb: 0 },
+    activatedAt: null
+  };
+}
+
 function ensureStore() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
   if (!fs.existsSync(STORE_FILE)) {
     const seed = {
-      agents: seedAgents(),
+      // No agents until customer completes billing and deploys
+      agents: [],
       events: [],
-      subscriptions: {
-        plan: 'Pro',
-        price: 99,
-        period: 'monthly',
-        addonSecurity: true,
-        agentsLimit: 100,
-        usage: { agents: 0, apiCalls: 48200, storageGb: 12.4 }
-      },
-      invoices: [
-        { id: 'INV-0034', date: '2025-03-14', amount: '$99.00', status: 'Paid', method: 'card' },
-        { id: 'INV-0033', date: '2025-02-14', amount: '$99.00', status: 'Paid', method: 'card' },
-        { id: 'INV-0032', date: '2025-01-14', amount: '₿ 0.0024', status: 'BTC', method: 'btc' },
-        { id: 'INV-0031', date: '2024-12-14', amount: '$99.00', status: 'Paid', method: 'card' },
-        { id: 'INV-0030', date: '2024-11-14', amount: '$99.00', status: 'Failed', method: 'card' }
-      ]
+      subscriptions: defaultSubscription(),
+      invoices: []
     };
     fs.writeFileSync(STORE_FILE, JSON.stringify(seed, null, 2));
+    return;
   }
+
+  // Migrate older stores that assumed an always-on Pro plan
+  try {
+    const store = JSON.parse(fs.readFileSync(STORE_FILE, 'utf8'));
+    let changed = false;
+    if (!store.subscriptions) {
+      store.subscriptions = defaultSubscription();
+      changed = true;
+    } else if (typeof store.subscriptions.active !== 'boolean') {
+      // Treat legacy seeded "Pro" demo as inactive so billing is required
+      store.subscriptions.active = false;
+      store.subscriptions.plan = store.subscriptions.plan || null;
+      changed = true;
+    }
+    if (!Array.isArray(store.agents)) {
+      store.agents = [];
+      changed = true;
+    }
+    if (!Array.isArray(store.events)) {
+      store.events = [];
+      changed = true;
+    }
+    if (!Array.isArray(store.invoices)) {
+      store.invoices = [];
+      changed = true;
+    }
+    if (changed) fs.writeFileSync(STORE_FILE, JSON.stringify(store, null, 2));
+  } catch (_) {
+    /* ignore migrate errors */
+  }
+}
+
+function hasActiveSubscription(store) {
+  return !!(store.subscriptions && store.subscriptions.active === true && store.subscriptions.plan);
 }
 
 function seedAgents() {
@@ -127,16 +163,18 @@ app.get('/api/status', (_req, res) => {
   const pending = store.agents.filter(a => a.status === 'queued').length;
   const envs = new Set(store.agents.map(a => a.environment)).size;
   res.json({
-    brand: 'HEXACRIMSON LABS',
+    brand: 'Hexacrimson Labs',
     version: '3.2.1',
     activeAgents: online,
     installing,
     pending,
     environments: envs,
     avgInstallSeconds: 4.2,
-    uptimePercent: 99.97,
+    uptimePercent: online ? 99.97 : 100,
     failedDeploysToday: 0,
-    hub: 'hub.hexacrimson.io:443'
+    hub: 'hub.hexacrimson.io:443',
+    billingActive: hasActiveSubscription(store),
+    plan: store.subscriptions?.plan || null
   });
 });
 
@@ -154,6 +192,28 @@ app.get('/api/agents/:id', (req, res) => {
 
 app.post('/api/agents/enroll', (req, res) => {
   const store = loadStore();
+
+  // Billing must be completed before any agent can be deployed
+  if (!hasActiveSubscription(store)) {
+    return res.status(402).json({
+      error: 'Billing required',
+      code: 'BILLING_REQUIRED',
+      message: 'Complete a subscription plan before deploying agents.',
+      billingUrl: '/#pricing'
+    });
+  }
+
+  const limit = store.subscriptions.agentsLimit || 0;
+  const liveCount = store.agents.filter(a => a.status !== 'offline').length;
+  if (limit > 0 && liveCount >= limit) {
+    return res.status(403).json({
+      error: 'Agent limit reached',
+      code: 'AGENT_LIMIT',
+      message: `Your ${store.subscriptions.plan} plan allows up to ${limit} agents. Upgrade to deploy more.`,
+      billingUrl: '/#pricing'
+    });
+  }
+
   const token = (req.body.token || req.headers['x-enroll-token'] || '').toString();
   if (!token || !token.startsWith('hxl-')) {
     return res.status(401).json({
@@ -292,24 +352,32 @@ app.get('/api/metrics/summary', (_req, res) => {
 
 app.get('/api/billing/subscription', (_req, res) => {
   const store = loadStore();
-  res.json(store.subscriptions);
+  const sub = store.subscriptions || defaultSubscription();
+  res.json({
+    ...sub,
+    active: hasActiveSubscription(store),
+    canDeploy: hasActiveSubscription(store)
+  });
 });
 
 app.post('/api/billing/subscribe', (req, res) => {
   const store = loadStore();
   const { plan = 'Pro', price = 99, period = 'monthly', addonSecurity = false, method = 'card' } = req.body || {};
   const planLimits = { Starter: 10, Pro: 100, Enterprise: 999999 };
+  const normalized = String(plan);
   store.subscriptions = {
+    ...defaultSubscription(),
     ...store.subscriptions,
-    plan,
+    active: true,
+    plan: normalized,
     price: Number(price) || 99,
     period,
     addonSecurity: !!addonSecurity,
-    agentsLimit: planLimits[plan] || 100,
+    agentsLimit: planLimits[normalized] || 100,
     method,
     activatedAt: new Date().toISOString()
   };
-  const invId = `INV-${String(35 + store.invoices.length).padStart(4, '0')}`;
+  const invId = `INV-${String(1000 + store.invoices.length + 1)}`;
   store.invoices.unshift({
     id: invId,
     date: new Date().toISOString().slice(0, 10),
@@ -317,7 +385,7 @@ app.post('/api/billing/subscribe', (req, res) => {
     status: method === 'btc' ? 'BTC' : 'Paid',
     method
   });
-  pushEvent(store, 'billing', `Subscription set to ${plan} (${method})`);
+  pushEvent(store, 'billing', `Subscription activated: ${normalized} (${method}) — agent deploy unlocked`);
   saveStore(store);
   res.json({ ok: true, subscription: store.subscriptions, invoice: store.invoices[0] });
 });

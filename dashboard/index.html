@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HEXACRIMSON LABS // Control Plane</title>
+  <title>Control plane · Hexacrimson Labs</title>
+  <link rel="icon" href="/public/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/public/favicon.svg" />
+  <meta name="theme-color" content="#DC143C" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -136,8 +139,17 @@
     </div>
   </div>
 
+  <div class="billing-banner" id="billingBanner" hidden>
+    <div class="billing-banner-inner">
+      <strong>Billing required</strong>
+      <span>Subscribe to a plan before enrolling or deploying agents.</span>
+      <a class="btn-primary" href="/#pricing">Choose a plan</a>
+    </div>
+  </div>
+
   <div class="toast" id="toast"><div class="toast-body" id="toastBody"></div></div>
 
+  <script src="/js/billing-gate.js"></script>
   <script src="/js/dashboard.js"></script>
 </body>
 </html>

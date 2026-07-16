@@ -27,8 +27,43 @@
     $('#enrollModal').classList.remove('open');
   }
 
-  $('#enrollBtn')?.addEventListener('click', (e) => { e.preventDefault(); openEnroll(); });
-  $('#enrollBtn2')?.addEventListener('click', openEnroll);
+  async function ensureBillingOrRedirect() {
+    if (window.HxlBilling) {
+      const gate = await window.HxlBilling.requireBilling();
+      if (!gate.ok) {
+        toast(gate.message || 'Complete billing before deploying agents.');
+        const banner = $('#billingBanner');
+        if (banner) banner.hidden = false;
+        setTimeout(() => { window.location.href = '/#pricing'; }, 900);
+        return false;
+      }
+      const banner = $('#billingBanner');
+      if (banner) banner.hidden = true;
+      return true;
+    }
+    try {
+      const res = await fetch('/api/billing/subscription');
+      const sub = await res.json();
+      if (!sub.active) {
+        toast('Complete billing before deploying agents.');
+        window.location.href = '/#pricing';
+        return false;
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  $('#enrollBtn')?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    if (!(await ensureBillingOrRedirect())) return;
+    openEnroll();
+  });
+  $('#enrollBtn2')?.addEventListener('click', async () => {
+    if (!(await ensureBillingOrRedirect())) return;
+    openEnroll();
+  });
   $('#closeEnroll')?.addEventListener('click', closeEnroll);
   $('#enrollModal')?.addEventListener('click', (e) => {
     if (e.target.id === 'enrollModal') closeEnroll();
@@ -48,6 +83,7 @@
 
   $('#enrollForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (!(await ensureBillingOrRedirect())) return;
     const fd = new FormData(e.target);
     const payload = Object.fromEntries(fd.entries());
     try {
@@ -60,7 +96,13 @@
         body: JSON.stringify(payload)
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Enroll failed');
+      if (res.status === 402 || data.code === 'BILLING_REQUIRED') {
+        toast(data.message || 'Billing required before deploy.');
+        closeEnroll();
+        window.location.href = data.billingUrl || '/#pricing';
+        return;
+      }
+      if (!res.ok) throw new Error(data.error || data.message || 'Enroll failed');
       toast(`Agent ${data.agent.id} online — PID ${data.agent.pid}`);
       closeEnroll();
       e.target.reset();
@@ -186,6 +228,17 @@
     }
   });
 
+  async function refreshBillingBanner() {
+    try {
+      const res = await fetch('/api/billing/subscription');
+      const sub = await res.json();
+      const banner = $('#billingBanner');
+      if (banner) banner.hidden = !!sub.active;
+    } catch (_) {}
+  }
+
   loadAll();
+  refreshBillingBanner();
   setInterval(loadAll, 8000);
+  setInterval(refreshBillingBanner, 15000);
 })();

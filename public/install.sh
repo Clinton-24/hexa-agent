@@ -51,6 +51,20 @@ echo -e "${DIM}\$ configuring agent service...${NC}"
 sleep 0.5
 step "Configuring system service ... done"
 
+echo -e "${DIM}\$ checking subscription...${NC}"
+SUB_JSON="$(curl -sS "${HUB}/api/billing/subscription" || true)"
+SUB_ACTIVE="$(printf '%s' "$SUB_JSON" | python3 -c "import sys,json; d=json.load(sys.stdin); print('1' if d.get('active') else '0')" 2>/dev/null || echo 0)"
+if [ "$SUB_ACTIVE" != "1" ]; then
+  # fallback without python
+  if ! printf '%s' "$SUB_JSON" | grep -q '"active":true'; then
+    warn "Billing required — complete a plan before deploying agents."
+    echo "  Open: ${HUB}/#pricing"
+    echo "  Then re-run this installer."
+    exit 2
+  fi
+fi
+step "Subscription active — deploy unlocked"
+
 echo -e "${DIM}\$ enrolling with control plane...${NC}"
 RESP="$(curl -sS -X POST "${HUB}/api/agents/enroll" \
   -H "Content-Type: application/json" \
@@ -61,12 +75,19 @@ RESP="$(curl -sS -X POST "${HUB}/api/agents/enroll" \
 if command -v python3 >/dev/null 2>&1; then
   AGENT_ID="$(printf '%s' "$RESP" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('agent',{}).get('id',''))" 2>/dev/null || true)"
   PID="$(printf '%s' "$RESP" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('agent',{}).get('pid','0'))" 2>/dev/null || echo 0)"
+  ERR_CODE="$(printf '%s' "$RESP" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('code',''))" 2>/dev/null || true)"
 else
   AGENT_ID="$(printf '%s' "$RESP" | sed -n 's/.*"id":"\([^"]*\)".*/\1/p' | head -1)"
   PID="18472"
+  ERR_CODE=""
 fi
 
 if [ -z "${AGENT_ID}" ]; then
+  if printf '%s' "$RESP" | grep -q 'BILLING_REQUIRED'; then
+    warn "Billing required — complete a plan before deploying agents."
+    echo "  Open: ${HUB}/#pricing"
+    exit 2
+  fi
   warn "Enrollment failed — is the control plane up at ${HUB}?"
   echo "$RESP"
   exit 1

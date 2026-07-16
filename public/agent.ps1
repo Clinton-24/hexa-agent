@@ -44,6 +44,20 @@ $body = @{
   arch        = $arch
 } | ConvertTo-Json
 
+Write-Host "checking subscription..." -ForegroundColor DarkGray
+try {
+  $sub = Invoke-RestMethod -Method Get -Uri "$Hub/api/billing/subscription"
+  if (-not $sub.active) {
+    Write-Host "! Billing required — complete a plan before deploying agents." -ForegroundColor Red
+    Write-Host "  Open: $Hub/#pricing"
+    exit 2
+  }
+  Write-Host "✓ Subscription active — deploy unlocked" -ForegroundColor Cyan
+} catch {
+  Write-Host "! Could not verify billing: $_" -ForegroundColor Red
+  exit 1
+}
+
 Write-Host "enrolling with control plane..." -ForegroundColor DarkGray
 try {
   $resp = Invoke-RestMethod -Method Post -Uri "$Hub/api/agents/enroll" `
@@ -52,6 +66,7 @@ try {
     -Body $body
 } catch {
   Write-Host "! Enrollment failed: $_" -ForegroundColor Red
+  Write-Host "  If this is a billing error, open $Hub/#pricing first."
   exit 1
 }
 

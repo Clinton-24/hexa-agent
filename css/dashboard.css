@@ -1,3 +1,17 @@
+.billing-banner {
+  position: sticky; top: 64px; z-index: 90;
+  background: rgba(220, 20, 60, 0.12);
+  border-bottom: 1px solid rgba(220, 20, 60, 0.35);
+  backdrop-filter: blur(10px);
+}
+.billing-banner-inner {
+  max-width: 1400px; margin: 0 auto; padding: .85rem 5%;
+  display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1rem;
+  font-size: .9rem; color: rgba(255,255,255,.85);
+}
+.billing-banner-inner span { flex: 1; color: rgba(255,255,255,.55); min-width: 180px; }
+.billing-banner-inner .btn-primary { padding: .45rem 1rem; font-size: .8rem; text-decoration: none; }
+
 .dash { max-width: 1400px; margin: 0 auto; padding: 2rem 5% 4rem; }
 .dash-header {
   display: flex; justify-content: space-between; align-items: flex-end;

@@ -1,16 +1,18 @@
-# HEXACRIMSON LABS — Agent Install & Deploy
+# Hexacrimson Labs — Agent install & deploy
 
 Control-plane website for the Hexacrimson agent platform: marketing landing page, live dashboard, documentation, one-line installers, and REST APIs.
+
+**Billing gate:** customers must complete a subscription plan before any agent can be enrolled or deployed (UI, CLI installers, and API all enforce this).
 
 ## What it does
 
 | Surface | Behavior |
 |--------|----------|
-| **Landing** (`/`) | Deploy / pricing / install / billing UI. **Deploy agent** enrolls a real agent via the API. |
-| **Dashboard** (`/dashboard/`) | Live fleet: metrics, enroll, heartbeat, modules, decommission. |
+| **Landing** (`/`) | Deploy / pricing / install / billing UI. **Deploy agent** opens billing if inactive, otherwise enrolls. |
+| **Dashboard** (`/dashboard/`) | Live fleet: metrics, enroll, heartbeat, modules, decommission (requires active plan). |
 | **Docs** (`/docs/…`) | Quickstart, API, security, CLI. |
-| **Installer** (`/install.sh`) | One-liner enrolls this host with the control plane. |
-| **API** (`/api/…`) | Agents, metrics, events, billing. |
+| **Installer** (`/install.sh`) | One-liner enrolls this host — blocked until billing is active. |
+| **API** (`/api/…`) | Agents, metrics, events, billing (`402` if deploy without subscription). |
 
 ## Quick start
 
@@ -56,12 +58,22 @@ curl -X POST http://localhost:3000/api/agents/enroll \
   -d "{\"token\":\"hxl-7f3a9c2e1b4d8a6f\",\"hostname\":\"edge-01\",\"environment\":\"aws\"}"
 ```
 
-## Deploy on Render
+## Deploy on Render (clean URL, no `-q1ie` suffix)
+
+Render appends a random suffix (like `q1ie`) when the service name is not unique. Use a clean unique name:
 
 1. Push this repo to GitHub.
-2. Create a **Web Service** from the repo (or use `render.yaml`).
-3. Build: `npm install` · Start: `npm start`
-4. Set `PUBLIC_URL` to your Render URL (e.g. `https://your-service.onrender.com`) so install scripts point at the right hub.
+2. Create a **Web Service** named **`hexacrimson-labs`** (or use `render.yaml`).
+3. That yields: **`https://hexacrimson-labs.onrender.com`**
+4. Build: `npm install` · Start: `npm start`
+5. Set `PUBLIC_URL=https://hexacrimson-labs.onrender.com`
+
+If an old service already exists as `hexa-agent-q1ie`:
+
+- **Settings → General → Name** → rename to `hexacrimson-labs` (if available), **or**
+- Create a new service with that name and delete the old one.
+
+Optional: attach a custom domain (e.g. `agents.hexacrimson.io`) under Render → Custom Domains.
 
 ## Project layout
 
