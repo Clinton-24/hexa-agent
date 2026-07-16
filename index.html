@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hexacrimson Labs | Agent install & deploy</title>
+    <title>HEXA-AGENT | Install & deploy control plane</title>
     <link rel="icon" href="/public/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/public/favicon.svg" />
     <meta name="theme-color" content="#DC143C" />
@@ -2349,27 +2349,27 @@
             <div class="hero-left">
                 <div class="tag">
                     <span class="tag-dot"></span>
-                    <span><span class="brand-crimson">HEXACRIMSON</span> <span class="labs-white">LABS</span> agent platform</span>
+                    <span><span class="brand-crimson">HEXA</span><span class="labs-white">AGENT</span> deployment control plane</span>
                 </div>
                 <h1>
                     Deploy.<br />
-                    <span class="outline">Orchestrate.</span><br />
-                    <span class="gradient">Dominate.</span>
+                    <span class="outline">Monitor.</span><br />
+                    <span class="gradient">Scale.</span>
                 </h1>
                 <p>
-                    One command deploys the <span class="brand-crimson">HEXACRIMSON</span> <span class="labs-white">LABS</span> agent.
-                    Lightweight, cryptographically signed, and ready to stream telemetry back to your control plane.
+                    One command installs the <span class="brand-crimson">HEXA</span><span class="labs-white">AGENT</span> experience on your target and streams status back to your live dashboard.
+                    Lightweight, secure, and ready for rapid rollout across environments.
                 </p>
 
                 <div class="code-block">
-                    <div class="line"><span class="comment"># hexacrimson labs agent — one-line deployment</span></div>
-                    <div class="line"><span class="prompt">$</span> <span class="cmd">curl -sSL https://hexacrimson.io | sh</span></div>
+                    <div class="line"><span class="comment"># hexa-agent — one-line deployment</span></div>
+                    <div class="line"><span class="prompt">$</span> <span class="cmd">curl -sSL https://hexacrimson-labs.onrender.com/install.sh | bash</span></div>
                     <div class="line">&nbsp;</div>
-                    <div class="line"><span class="output">✓ Downloaded agent binary (2.1 MB)</span></div>
-                    <div class="line"><span class="output">✓ Checksum verified — SHA256 match</span></div>
-                    <div class="line"><span class="output">⚙️  Configuring system service ... done</span></div>
-                    <div class="line"><span class="output">🚀 Agent <span class="highlight">active (running)</span> — PID 18472</span></div>
-                    <div class="line"><span class="output">🌐 Connected to <span class="highlight">hub.hexacrimson.io:443</span></span></div>
+                    <div class="line"><span class="output">✓ Installer downloaded successfully</span></div>
+                    <div class="line"><span class="output">✓ Signature verified — ready to launch</span></div>
+                    <div class="line"><span class="output">⚙️  Registering with the control plane ... done</span></div>
+                    <div class="line"><span class="output">🚀 Agent <span class="highlight">active (running)</span> — endpoint online</span></div>
+                    <div class="line"><span class="output">🌐 Dashboard synced to <span class="highlight">/dashboard</span></span></div>
                     <div class="line">&nbsp;</div>
                     <div class="line">
                         <span class="prompt">$</span>
@@ -2379,7 +2379,7 @@
 
                 <div class="btn-group">
                     <a href="#" class="btn-primary" onclick="triggerInstall(event)">
-                        Install agent
+                        Deploy now
                         <span class="btn-arrow">→</span>
                     </a>
                     <a href="#pricing" class="btn-secondary">

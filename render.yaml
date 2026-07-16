@@ -1,11 +1,10 @@
 services:
   - type: web
-    # Service name becomes the Render URL: https://hexacrimson-labs.onrender.com
-    # (avoid random suffixes like -q1ie by using a clean unique name)
     name: hexacrimson-labs
     runtime: node
+    rootDir: .
     plan: free
-    buildCommand: npm install
+    buildCommand: npm ci
     startCommand: npm start
     envVars:
       - key: NODE_ENV
