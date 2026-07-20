@@ -445,8 +445,10 @@ setInterval(() => {
 
 ensureStore();
 
-app.listen(PORT, () => {
-  console.log(`HEXACRIMSON LABS control plane listening on :${PORT}`);
+// Bind 0.0.0.0 so cloud hosts (Render, etc.) can reach the process
+const HOST = process.env.HOST || '0.0.0.0';
+app.listen(PORT, HOST, () => {
+  console.log(`HEXACRIMSON LABS control plane listening on ${HOST}:${PORT}`);
   console.log(`  Landing:   ${PUBLIC_URL}/`);
   console.log(`  Dashboard: ${PUBLIC_URL}/dashboard/`);
   console.log(`  Install:   curl -sSL ${PUBLIC_URL}/install.sh | bash`);

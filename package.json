@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "hexa-agent",
   "version": "3.2.1",
   "private": true,
@@ -9,18 +9,9 @@
     "dev": "node server.js",
     "build": "echo \"No build step required\""
   },
-  "files": [
-    "server.js",
-    "public",
-    "dashboard",
-    "css",
-    "js",
-    "data"
-  ],
   "engines": {
-    "node": ">=20 <25"
+    "node": ">=18"
   },
-  "packageManager": "npm@10.8.2",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.2",
