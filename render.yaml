@@ -4,8 +4,18 @@ services:
     runtime: node
     rootDir: .
     plan: free
-    buildCommand: yarn install
-    startCommand: yarn start
+    buildCommand: |
+      if [ -f package.json ]; then
+        npm install
+      else
+        cd hexa-agent && npm install
+      fi
+    startCommand: |
+      if [ -f package.json ]; then
+        npm start
+      else
+        cd hexa-agent && npm start
+      fi
     envVars:
       - key: NODE_ENV
         value: production
